@@ -66,7 +66,7 @@ def main():
     )
     with open(save_dir + result_file, "a") as res_file:
         res_file.write(f"VQE energy:\n{vqe_energy}\n")
-        res_file.write(f"VQE params (x pi/2):\n{np.array(vqe_params)}\n\n")
+        res_file.write(f"VQE params:\n{np.array(vqe_params)}\n\n")
 
 
 if __name__ == "__main__":
