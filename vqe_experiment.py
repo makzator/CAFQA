@@ -1,4 +1,11 @@
 import numpy as np
+
+from qiskit_nature.units import DistanceUnit
+from qiskit_nature.second_q.circuit.library import HartreeFock
+from qiskit_nature.second_q.transformers import ActiveSpaceTransformer
+from qiskit_nature.second_q.drivers import PySCFDriver
+from qiskit_nature.second_q.mappers import ParityMapper, QubitConverter
+
 from skquant.opt import minimize
 import hypermapper
 import json
@@ -7,6 +14,48 @@ import sys
 from vqe_helpers import *
 from circuit_manipulation import *
 
+
+def molecule(atom_string, new_num_orbitals=None, **kwargs):
+    """
+    Compute Hamiltonian for molecule in qubit encoding using Qiskit Nature.
+    atom_string (String): string to describe molecule, passed to PySCFDriver.
+    new_num_orbitals (Int): Number of orbitals in active space (if None, use default result from PySCFDriver).
+    kwargs (Dict): All the arguments that need to be passed on to the next function calls.
+
+    Returns:
+    (Iterable[Float], Iterable[String], String) (Pauli coefficients, Pauli strings, Hartree-Fock bitstring)
+    """
+    converter = QubitConverter(ParityMapper(), two_qubit_reduction=True)
+    driver = PySCFDriver(
+        atom=atom_string,
+        basis="sto3g",
+        charge=0,
+        spin=0,
+        unit=DistanceUnit.ANGSTROM
+    )
+    problem = driver.run()
+    if new_num_orbitals is not None:
+        num_electrons = (problem.num_alpha, problem.num_beta)
+        transformer = ActiveSpaceTransformer(num_electrons, new_num_orbitals)
+        problem = transformer.transform(problem)
+    ferOp = problem.hamiltonian.second_q_op()
+    qubitOp = converter.convert(ferOp, problem.num_particles)
+    initial_state = HartreeFock(
+        problem.num_spatial_orbitals,
+        problem.num_particles,
+        converter
+    )
+    bitstring = "".join(["1" if bit else "0" for bit in initial_state._bitstr])
+    # need to reverse order bc of qiskit endianness
+    paulis = [x[::-1] for x in qubitOp.primitive.paulis.to_labels()]
+    # add the shift as extra I pauli
+    paulis.append("I"*len(paulis[0]))
+    paulis = np.array(paulis)
+    coeffs = list(qubitOp.primitive.coeffs)
+    # add the shift (nuclear repulsion)
+    coeffs.append(problem.nuclear_repulsion_energy)
+    coeffs = np.array(coeffs).real
+    return coeffs, paulis, bitstring
 
 def run_vqe(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backend, save_dir, loss_file, params_file, vqe_kwargs):
     """
@@ -18,7 +67,7 @@ def run_vqe(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backend,
     budget (Int): Max number of optimization iterations.
     shots (Int): Number of VQE circuit execution shots.
     mode (String): ["no_noisy_sim", "device_execution", "noisy_sim"].
-    backend (IBM backend): Can be simulator, fake backend or real backend; only with mode = "device_execution".
+    backend (IBM backend): Can be simulator, fake backend or real backend; irrelevant with mode = "no_noisy_sim".
     save_dir (String): Save directory.
     loss_file (String): Name of save file for VQE loss/energy.
     params_file (String): Name of save file for VQE parameters.

@@ -133,7 +133,7 @@ def all_transpiled_vqe_circuits(n_qubits, parameters, paulis, backend, seed_tran
     n_qubits (Int): Number of qubits in circuit.
     parameters (Iterable[Float]): VQE parameters.
     paulis (Iterable[String]): Corresponding Pauli strings in Hamiltonian (same order as coeffs).
-    backend (IBM backend): Can be simulator, fake backend or real backend; only with mode = "device_execution".
+    backend (IBM backend): Can be simulator, fake backend or real backend; irrelevant with mode = "no".
     seed_transpiler (Int): Random seed for the transpiler. Default is 25 because favorite number of Jason D. Chadwick.
     remove_barriers (Bool): Whether to remove barriers.
     kwargs (Dict): All the arguments that need to be passed on to the next function calls.
