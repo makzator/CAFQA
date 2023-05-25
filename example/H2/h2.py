@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit.providers.fake_provider import FakeMumbai
 import sys
-sys.path.append("../")
+sys.path.append("../../")
 
 from vqe_experiment import *
 
