@@ -59,6 +59,19 @@ def molecule(atom_string, new_num_orbitals=None, **kwargs):
     return coeffs, paulis, bitstring
 
 def ising_model(N, Jx, h, Jy=0., periodic=False):
+    """
+    Constructs qubit Hamiltonian for linear Ising model.
+    H = sum_{i=0...N-2} (Jx_i X_i X_{i+1} + Jy_i Y_i Y_{i+1}) + sum_{i=0...N-1}  h_i Z_i
+
+    N (Int): # sites/qubits.
+    Jx (Float, Iterable[Float]): XX strength, either constant value or list (values for each pair of neighboring sites).
+    h (Float, Iterable[Float]): Z self-energy, either constant value or list (values for each site).
+    Jy (Float, Iterable[Float]): YY strength, either constant value or list (values for each pair of neighboring sites).
+    periodic: If periodic boundary conditions. If True, include term X_0 X_{N-1} and Y_0 Y_{N-1}.
+
+    Returns:
+    (Iterable[Float], Iterable[String], String) (Pauli coefficients, Pauli strings, "0"*N)
+    """
     if isinstance(Jx, Number):
         if periodic:
             Jx = [Jx] * N
