@@ -10,6 +10,7 @@ from skquant.opt import minimize
 import hypermapper
 import json
 import sys
+from numbers import Number
 
 from vqe_helpers import *
 from circuit_manipulation import *
@@ -56,6 +57,48 @@ def molecule(atom_string, new_num_orbitals=None, **kwargs):
     coeffs.append(problem.nuclear_repulsion_energy)
     coeffs = np.array(coeffs).real
     return coeffs, paulis, bitstring
+
+def ising_model(N, Jx, h, Jy=0., periodic=False):
+    if isinstance(Jx, Number):
+        if periodic:
+            Jx = [Jx] * N
+        else:
+            Jx = [Jx] * (N-1)
+    if isinstance(Jy, Number):
+        if periodic:
+            Jy = [Jy] * N
+        else:
+            Jy = [Jy] * (N-1)
+    if isinstance(h, Number):
+        h = [h] * N        
+    if N > 1:
+        assert len(Jx) == N if periodic else len(Jx) == N-1, "Jx has wrong length"
+        assert len(Jy) == N if periodic else len(Jy) == N-1, "Jy has wrong length"
+        assert len(h) == N, "h has wrong length"
+    coeffs = []
+    paulis = []
+    # add XX terms
+    for j in range(N-1):
+        if np.abs(Jx[j]) > 1e-12:
+            coeffs.append(Jx[j])
+            paulis.append("I"*j+"XX"+"I"*(N-j-2))
+    if N > 2 and periodic and np.abs(Jx[N-1]) > 1e-12:
+        coeffs.append(Jx[N-1])
+        paulis.append("X"+"I"*(N-2)+"X")
+    # add YY terms
+    for j in range(N-1):
+        if np.abs(Jy[j]) > 1e-12:
+            coeffs.append(Jy[j])
+            paulis.append("I"*j+"YY"+"I"*(N-j-2))
+    if N > 2 and periodic and np.abs(Jy[N-1]) > 1e-12:
+        coeffs.append(Jy[N-1])
+        paulis.append("Y"+"I"*(N-2)+"Y")
+    # add Z terms
+    for j in range(N):
+        if np.abs(h[j]) > 1e-12:
+            coeffs.append(h[j])
+            paulis.append("I"*j+"Z"+"I"*(N-j-1))
+    return coeffs, paulis, "0"*N
 
 def run_vqe(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backend, save_dir, loss_file, params_file, vqe_kwargs):
     """
