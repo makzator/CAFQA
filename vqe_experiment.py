@@ -106,7 +106,7 @@ def run_vqe(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backend,
     return energy_vqe, params_vqe
 
 
-def run_cafqa(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backend, save_dir, loss_file, params_file, vqe_kwargs):
+def run_cafqa(n_qubits, coeffs, paulis, param_guess, budget, save_dir, loss_file, params_file, vqe_kwargs):
     """
     Run CAFQA VQE instance. Uses stim for fast Clifford circuit simulation and hypermapper for discrete optimization.
     n_qubits (Int): Number of qubits in circuit.
@@ -114,9 +114,6 @@ def run_cafqa(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backen
     paulis (Iterable[String]): Corresponding Pauli strings in Hamiltonian (same order as coeffs).
     param_guess (Iterable[0...3]): Initial guess for CAFQA VQE parameters, which are factors for pi/2. E.g. param_guess = [1,0,0,2,3,1] for 6-parameter VQE with real parameters [pi/2,0,0,pi,3pi/2,pi/2].
     budget (Int): Max number of optimization iterations.
-    shots (Int): --Not relevant here--.
-    mode (String): --Not relevant here--.
-    backend (IBM backend): --Not relevant here--.
     save_dir (String): Save directory.
     loss_file (String): Name of save file for VQE loss/energy.
     params_file (String): Name of save file for VQE parameters.
@@ -126,7 +123,9 @@ def run_cafqa(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backen
     Tuple of energy estimate and optimized CAFQA parameters.
     """
     # check right number of parameters given
-    _, num_params = efficientsu2_full(n_qubits, vqe_kwargs["ansatz_reps"])
+    ansatz_func = vqe_kwargs.get("ansatz_func", efficientsu2_full)
+    ansatz_reps = vqe_kwargs.get("ansatz_reps", 1)
+    _, num_params = ansatz_func(n_qubits, ansatz_reps)
     if len(param_guess) == 0:
         param_guess = [0] * num_params
     assert len(param_guess) == num_params, f"Number of parameters given ({len(param_guess)}) does not match ansatz ({num_params})." 
@@ -165,9 +164,6 @@ def run_cafqa(n_qubits, coeffs, paulis, param_guess, budget, shots, mode, backen
             params_filename=save_dir + "/" + params_file,
             paulis=paulis, 
             coeffs=coeffs,
-            shots=shots, 
-            backend=backend, 
-            mode=mode, 
             **vqe_kwargs
         ))
     sys.stdout = stdout

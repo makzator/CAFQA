@@ -1,0 +1,179 @@
+{
+    "application_name": "cafqa_optimization",
+    "optimization_objectives": [
+        "value"
+    ],
+    "design_of_experiment": {
+        "number_of_samples": 100
+    },
+    "optimization_iterations": 100,
+    "models": {
+        "model": "random_forest"
+    },
+    "input_parameters": {
+        "x0": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 0
+        },
+        "x1": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 3
+        },
+        "x2": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x3": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x4": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 0
+        },
+        "x5": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 3
+        },
+        "x6": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 1
+        },
+        "x7": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 0
+        },
+        "x8": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 1
+        },
+        "x9": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 1
+        },
+        "x10": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x11": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x12": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 0
+        },
+        "x13": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x14": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        },
+        "x15": {
+            "parameter_type": "ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "parameter_default": 2
+        }
+    },
+    "print_best": true,
+    "print_posterior_best": true,
+    "log_file": "cafqa_example_out//hypermapper_log.log",
+    "output_data_file": "cafqa_example_out//hypermapper_output.csv"
+}
